@@ -3,6 +3,7 @@ const urlsToCache = [
     '/',
     '/index.html',
     '/restaurant.html',
+    '/restaurant.html?id=*',
     '/css/styles.css',
     '/js/dbhelper.js',
     '/js/main.js',
@@ -19,8 +20,10 @@ const urlsToCache = [
     '/img/8.jpg',
     '/img/9.jpg',
     '/img/10.jpg',
-    'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700',
-    'https://use.fontawesome.com/releases/v5.0.13/css/all.css'
+    'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
+    'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js',
+    'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
+    'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon-2x.png'
 ];
 
 self.addEventListener('install', function (event) {
