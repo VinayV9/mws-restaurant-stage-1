@@ -335,9 +335,15 @@ section{
     flex-direction: column;
   }
 }
-@media only screen and (max-width:475px){
+@media only screen and (max-width:450px){
   .filter-options{
     display: flex;
     flex-direction: column;
+  }
+}
+@media only screen and (max-width:450px){
+  #restaurants-list li {
+    width: 100%;
+    font-size: 10pt;
   }
 }
