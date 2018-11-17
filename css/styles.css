@@ -36,6 +36,9 @@ h1, h2, h3, h4, h5, h6 {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0 0 20px;
 }
+h3{
+  color: orange;
+}
 article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
 	display: block;
 }
@@ -328,6 +331,20 @@ img{
 }
 section{
   width: 100%;
+}
+#reviewForm{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  width:100%;
+}
+.formItem{
+  display: flex;
+  flex-direction: column;
+}
+label{
+  color: #f18200;
+  font-family: Arial,sans-serif;
 }
 @media only screen and (max-width:614px){
   .filter-options{

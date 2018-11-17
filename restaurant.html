@@ -37,16 +37,45 @@
     </section>
     <!-- End map -->
     <!-- Beginning restaurant -->
-    <section id="restaurant-container">
-      <h2 id="restaurant-name"></h2>
-      <img id="restaurant-img">
+    <section id="restaurant-container"  tab-index="-1">
+      <div>
+          <h2 id="restaurant-name"></h2>
+          <img tabindex="0" alt="add to fav restaurant" id="favorite_icon" src="img/empty_heart.png">
+      </div>
+      <img id="restaurant-img" alt="restaurant image">
       <p id="restaurant-cuisine"></p>
       <p id="restaurant-address"></p>
       <table id="restaurant-hours"></table>
+      <!-- review form -->
+      <form id="reviewForm">
+        <div class="formItem">
+            <label for="userName"><h3>Enter Your Name:</h3></label><br>
+            <input id="userName" type="text" name="name"><br><br>
+        </div>
+        <div class="formItem">
+            <label><h3>Rating :</h3></label>
+            <select id="rating" aria-label="Select rating">
+              <option value="1">1 Star</option>
+              <option value="2">2 Star</option>
+              <option value="3">3 Star</option>
+              <option value="4">4 Star</option>
+              <option value="5">5 Star</option>
+            </select>
+        </div>
+        <div class="formItem">
+            <label for="comments"><h3>Your Comment :</h3></label><br>
+            <textarea id="comments" rows="4" cols="50" name="comment"></textarea>
+        </div>
+        <div class="formItem">
+            <button onclick="addReview()" class="add_review">Post Review</button>
+        </div>
+      </form>
+      <!-- end review form -->
     </section>
     <!-- end restaurant -->
     <!-- Beginning reviews -->
     <section id="reviews-container">
+      <h3>Reviews</h3>
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->

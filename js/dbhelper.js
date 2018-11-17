@@ -3,6 +3,8 @@
  */
 let idbName = "restaurants";
 let objectStoreName = "restaurantStore";
+let reviewsObjectStoreName = "reviewsStore";
+
 class DBHelper {
 
   /**
@@ -49,13 +51,10 @@ class DBHelper {
               alert("sorry! you are offline. Please connect to internet");
             }
           } else {
-            //there is data in index db fetch it
-
             let index = db.transaction(objectStoreName)
               .objectStore(objectStoreName);
 
             return index.getAll().then(function (restaurants) {
-              console.log("return the index db data");
               callback(null, restaurants);
             });
           }
@@ -184,8 +183,8 @@ class DBHelper {
    */
   static imageUrlForRestaurant(restaurant) {
     let photograph = restaurant.photograph;
-    if(photograph === undefined){
-         photograph = 10;
+    if (photograph === undefined) {
+      photograph = 10;
     }
     return (`/img/${photograph}.jpg`);
   }
@@ -193,16 +192,123 @@ class DBHelper {
   /**
    * Map marker for a restaurant.
    */
-   static mapMarkerForRestaurant(restaurant, map) {
+  static mapMarkerForRestaurant(restaurant, map) {
     // https://leafletjs.com/reference-1.3.0.html#marker  
     const marker = new L.marker([restaurant.latlng.lat, restaurant.latlng.lng],
-      {title: restaurant.name,
-      alt: restaurant.name,
-      url: DBHelper.urlForRestaurant(restaurant)
+      {
+        title: restaurant.name,
+        alt: restaurant.name,
+        url: DBHelper.urlForRestaurant(restaurant)
       })
-      marker.addTo(newMap);
+    marker.addTo(newMap);
     return marker;
-  } 
+  }
+
+  static submitReview(review) {
+   
+    //check if user online or offline
+    if (!navigator.onLine) {
+      DBHelper.sendReviewWhenOnline(review);
+      return;
+    }
+    
+    let fetchOptions = {
+      method: "POST",
+      body: JSON.stringify(review),
+      headers: new Headers({
+        "content-Type": "application/json"
+      })
+    }
+
+    fetch(`http://localhost:1337/reviews/`, fetchOptions)
+    .then(response => {
+        const contentType = response.headers.get("content-Type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          return response.json();
+        } else {
+          console.log("api call successful");
+        }
+    })
+    .then(data => {
+        console.log("fetch successfull")
+    })
+    .catch(error => {
+        console.log("error occured in review fetch " + error);
+    });
+
+
+  }
+
+  static updateFavoriteStatus(restaurant_id, isFavorite) {
+    console.log("changing fav status on server");
+    let isFavoriteString = isFavorite.toString();
+
+    fetch(`http://localhost:1337/restaurants/${restaurant_id}/?is_favorite=${isFavoriteString}`, {
+      method: 'PUT'
+    })
+    .then(() => {
+      console.log("yay! changed fav on server");
+      let dbPromise = openIndexDb();
+      dbPromise.then((db) => {
+
+        let tx = db.transaction(objectStoreName, 'readwrite');
+        let store = tx.objectStore(objectStoreName);
+        console.log("opening the objectstore");
+
+
+        store.get(restaurant_id).then(restaurant => {
+          restaurant.is_favorite = isFavoriteString;
+          console.log("update server check type of is_favorite " + restaurant.is_favorite);
+          console.log(typeof restaurant.is_favorite);
+          console.log("isFavorite " + isFavorite);
+
+          store.put(restaurant);
+          console.log("putting updated restaurant in objectstore");
+
+        });
+      })
+
+    })
+
+  }
+
+  static sendReviewWhenOnline(offlineReview) {
+    //store the review in localstorage
+    localStorage.setItem("review", JSON.stringify(offlineReview));
+    //set listener to check when the user comes online using `onLine` eventListener
+    window.addEventListener('online', function () {
+      let review = JSON.parse(localStorage.getItem('review'));
+      // pass this review from localstorage to server
+      if (review !== null) {
+        DBHelper.submitReview(review);
+        localStorage.removeItem('review');
+      }
+    });
+  }
+
+  static fetchReviewsFromReviewsEndPoint(id,callback){
+    let fetchUrl =  `http://localhost:1337/reviews/?restaurant_id=${id}`;
+    
+    fetch(fetchUrl)
+    .then(response => response.json())
+    .then(reviews => {
+      callback(null,reviews);
+      let dbPromise = openIndexDb();
+
+      dbPromise.then(function(db) {
+         if (!db) return;
+         let tx = db.transaction(reviewsObjectStoreName, 'readwrite');
+         let store = tx.objectStore(reviewsObjectStoreName);
+         if(Array.isArray(reviews)){
+             reviews.forEach(function(review) {
+                store.put(review);
+             });
+         }else{
+             store.put(reviews);
+         }
+      });
+    });
+  }
 
 }
 
@@ -210,12 +316,17 @@ class DBHelper {
  * 
  */
 function openIndexDb() {
-  
+
   if (!navigator.serviceWorker) {
     return Promise.resolve();
   }
 
-  return idb.open(idbName, 1, function(upgradeDb) {
-    let store = upgradeDb.createObjectStore(objectStoreName, {keyPath: 'id'});
+  return idb.open(idbName, 2, function (upgradeDb) {
+    switch(upgradeDb.oldVersion){
+        case 0:
+           let store = upgradeDb.createObjectStore(objectStoreName, { keyPath: 'id' });
+        case 1:
+           let store = upgradeDb.createObjectStore(reviewsObjectStoreName, { keyPath: 'id' });
+    }
   });
 }
