@@ -87,21 +87,21 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   }
   // favarite icon logic
   favorite_icon.addEventListener("click", function(){
-   
+    console.log('e:):):):):):)');
     let isFavorite =  Boolean(restaurant.is_favorite); 
+    console.log(isFavorite+'dwsn');
     isFavorite = !isFavorite;
-
+    restaurant.is_favorite = isFavorite.toString();
     if(isFavorite){
       favorite_icon.src = "/img/filled_heart.png";
       favorite_icon.alt = "Marked as a favorite restaurant";
-      //Update to the server using PUT request
-      DBHelper.updateFavoriteStatus(restaurant.id, isFavorite);
+      console.log('fav');
     }else{
       favorite_icon.src = "/img/empty_heart.png";
       favorite_icon.alt = "Marked as a Unfavorite restaurant";
-      DBHelper.updateFavoriteStatus(restaurant.id, isFavorite);
+      console.log('unfav');
     }
-
+    DBHelper.updateFavoriteStatus(restaurant.id, isFavorite);
   });
 
   // fill operating hours
@@ -222,7 +222,14 @@ function addReview(){
   review.rating = parseInt(document.querySelector("#rating option:checked").value);
   review.comments = document.getElementById("comments").value;
   review.restaurant_id = getParameterByName("id");
-  
+  if(review.name === ''){
+     alert('please fill the username');
+     return;
+  }
+  if(review.comments === ''){
+    alert('please fill the comment section');
+    return;
+ }
   DBHelper.submitReview(review);
   document.getElementById("reviewForm").reset();
   fillReviewsHTML(review);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-site-cache-v8';
+const CACHE_NAME = 'my-site-cache-v81';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -55,7 +55,7 @@ self.addEventListener('fetch', function (event) {
                     let cloneRes = res.clone();
                     caches.open(CACHE_NAME).then(function(cache){
                         cache.put(event.request, cloneRes);
-                    });
+                    }); 
                     return res;
                 });
             })  

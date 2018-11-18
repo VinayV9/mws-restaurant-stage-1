@@ -211,10 +211,17 @@ class DBHelper {
       DBHelper.sendReviewWhenOnline(review);
       return;
     }
-    
+
+    let serverReview = {
+      "name": reviewBody.name,
+      "rating": parseInt(reviewBody.rating),
+      "comments": reviewBody.comments,
+      "restaurant_id": parseInt(reviewBody.restaurant_id)
+    };
+
     let fetchOptions = {
       method: "POST",
-      body: JSON.stringify(review),
+      body: JSON.stringify(serverReview),
       headers: new Headers({
         "content-Type": "application/json"
       })
@@ -253,18 +260,10 @@ class DBHelper {
 
         let tx = db.transaction(objectStoreName, 'readwrite');
         let store = tx.objectStore(objectStoreName);
-        console.log("opening the objectstore");
-
-
+        
         store.get(restaurant_id).then(restaurant => {
           restaurant.is_favorite = isFavoriteString;
-          console.log("update server check type of is_favorite " + restaurant.is_favorite);
-          console.log(typeof restaurant.is_favorite);
-          console.log("isFavorite " + isFavorite);
-
           store.put(restaurant);
-          console.log("putting updated restaurant in objectstore");
-
         });
       })
 
@@ -274,14 +273,14 @@ class DBHelper {
 
   static sendReviewWhenOnline(offlineReview) {
     //store the review in localstorage
-    localStorage.setItem("review", JSON.stringify(offlineReview));
+    localStorage.setItem("data", JSON.stringify(offlineReview));
     //set listener to check when the user comes online using `onLine` eventListener
     window.addEventListener('online', function () {
-      let review = JSON.parse(localStorage.getItem('review'));
+      let review = JSON.parse(localStorage.getItem("data"));
       // pass this review from localstorage to server
       if (review !== null) {
         DBHelper.submitReview(review);
-        localStorage.removeItem('review');
+        localStorage.removeItem("data");
       }
     });
   }
