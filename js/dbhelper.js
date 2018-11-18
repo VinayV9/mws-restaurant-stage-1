@@ -324,9 +324,9 @@ function openIndexDb() {
   return idb.open(idbName, 2, function (upgradeDb) {
     switch(upgradeDb.oldVersion){
         case 0:
-           let store = upgradeDb.createObjectStore(objectStoreName, { keyPath: 'id' });
+           var store = upgradeDb.createObjectStore(objectStoreName, { keyPath: 'id' });
         case 1:
-           let store = upgradeDb.createObjectStore(reviewsObjectStoreName, { keyPath: 'id' });
+           var store = upgradeDb.createObjectStore(reviewsObjectStoreName, { keyPath: 'id' });
     }
   });
 }

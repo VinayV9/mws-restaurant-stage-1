@@ -1,19 +1,19 @@
-const CACHE_NAME = 'my-site-cache-v7';
+const CACHE_NAME = 'my-site-cache-v8';
 const urlsToCache = [
     '/',
     '/index.html',
     '/restaurant.html',
-    '/restaurant.html?id=*',
+    'data/restaurants.json',
     '/css/styles.css',
     '/js/dbhelper.js',
     '/js/main.js',
-    '/js/restaurant_info.js',
-    '/js/swRegister.js',
-    '/icons/icon-72x72.png',
-    'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
-    'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js',
-    'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
-    'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon-2x.png'
+    '/js/restaurant_info.js'
+    // '/js/swRegister.js',
+    // '/icons/icon-72x72.png',
+    // 'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
+    // 'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js',
+    // 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon.png',
+    // 'https://unpkg.com/leaflet@1.3.1/dist/images/marker-icon-2x.png'
 ];
 
 self.addEventListener('install', function (event) {
@@ -22,8 +22,9 @@ self.addEventListener('install', function (event) {
         caches.open(CACHE_NAME)
             .then(function (cache) {
                 console.log('Opened cache');
-                return cache.addAll(urlsToCache);
+                cache.addAll(urlsToCache);
             })
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -44,7 +45,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', function (event) {
     event.respondWith(
-        caches.match(event.request)
+        caches.match(event.request, {ignoreSearch: true})
             .then(function (response) {
                 // Cache hit - return response
                 if (response) {
